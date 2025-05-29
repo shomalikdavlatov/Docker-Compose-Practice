@@ -1,6 +1,9 @@
 FROM node:22-alpine
-COPY package*.json yarn.lock
-RUN yarn install --freeze-lock && yarn clean cache
+WORKDIR /app
+COPY package*.json yarn.lock ./
+RUN yarn install --freeze-lockfile && yarn cache clean
 COPY . .
-RUN yarn build
-CMD ["yarn", "start:prod"]
+EXPOSE 3000
+RUN npx prisma generate
+RUN yarn build 
+CMD npx prisma db push && yarn start:prod
